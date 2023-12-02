@@ -124,8 +124,7 @@ function getSumOfGames(games) {
     for (let i = 0; i < gamesArray.length; i++) {
         let passingGame = true
         let gameValue = parseInt(parseGameValue(gamesArray[i]))
-        let handfuls = gamesArray[i].split(": ")[1]
-        let grabsArray = handfuls.split("; ")
+        let grabsArray = gamesArray[i].split(": ")[1].split("; ")
         for (const grab of grabsArray) {
            let diceCheck = grab.split(", ")
             for (const dice of diceCheck) {
@@ -155,8 +154,7 @@ function getSumOfCubesofCubes(games) {
         let maxRed = 0
         let maxBlue = 0
         let maxGreen = 0
-        let handfuls = gamesArray[i].split(": ")[1]
-        let grabsArray = handfuls.split("; ")
+        let grabsArray = gamesArray[i].split(": ")[1].split("; ")
         for (const grab of grabsArray) {
            let diceCheck = grab.split(", ")
             for (const dice of diceCheck) {
@@ -177,5 +175,5 @@ function getSumOfCubesofCubes(games) {
 
     return sum
 }
-
+console.log(getSumOfGames(games))
 console.log(getSumOfCubesofCubes(games))
