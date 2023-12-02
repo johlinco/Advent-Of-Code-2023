@@ -1001,20 +1001,37 @@ fivetczxxvjrrqfive1sevennvj6one3`
 
 function calibrationValues(list) {
     let sum = 0;
+    // generat array of lines
     let lines = list.split(/\r?\n/)
+
+    //iterate through each line
     for (const line of lines) {
+        
+        // initilaize values for first and last number to in each line
         let first = null;
         let last = null;
+
+        // iterate through each character in line to look for numbers
         for (let i = 0; i < line.length; i++) {
+
+            // check each character to see if it is a number
             if (parseInt(line[i]/parseInt(line[i])) === 1) {
+
+                // if no number has been found, set both first and last to 
+                //values of current number
                 if (first === null) {
                     first = line[i];
                     last = line[i]
+
+                    // if first value has been set, only modify last value
                 } else {
                     last = line[i]
                 }
             } 
         }
+
+        // while first and last are still strings, combine them and 
+        //then set that numbers to integer and add to sum
         sum = sum + parseInt(first + last)
     }
     return sum
@@ -1033,6 +1050,9 @@ let numbers = {
 }
 
 function numStringCheck(string, pos) {
+    // all numbers between 1-9  have character lengths of 3, 4, or 5
+    // we just need to check to see if the substrings of those lengths 
+    // are present in the numbers dictionary and then return that value
     if (numbers[string.slice(pos, pos + 3)]) {
         return numbers[string.slice(pos, pos +3)]
     } else if (numbers[string.slice(pos, pos + 4)]) {
