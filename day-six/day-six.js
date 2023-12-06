@@ -1,115 +1,104 @@
 const fs = require("fs");
 
-const input = fs.readFileSync("day-five/input.txt", "utf8");
-const example = fs.readFileSync("day-five/example.txt", "utf8");
+const input = fs.readFileSync("day-six/input.txt", "utf8");
+const example = fs.readFileSync("day-six/example.txt", "utf8");
 
-function mapsParser(data) {
-    let mapsArray = []
+function raceProductParser(data) {
+    let racesArray = []
     let lines = data.split(/\r?\n/)
 
-    mapsArray.push(lines[0].split(":")[1])
+    let times = lines[0].split(":")[1].trim()
+    let distances = lines[1].split(":")[1].trim()
 
-    for (let i = 3; i < lines.length; i++) {
-        let array = []
-        while (lines[i] !== "" && i < lines.length) {
-            array.push(lines[i])
-            i++
-        }
-        mapsArray.push(array)
-        i++
-    }
+    let timesArray = eliminateSpaces(times)
+    let distancesArray = eliminateSpaces(distances)
 
-    return(mapsArray)
-}
- 
-function passThroughMap(seedRange, map) {
-    let newValues = []
-    for (let seed of seedRange) {
-        seed = parseInt(seed)
-        if (seed/seed !==1) {
-            continue
-        } else {
-            for (const row of map) {
-                let values = row.split(" ")
-                let destination = parseInt(values[0])
-                let source = parseInt(values[1])
-                let range = parseInt(values[2])
-                if (seed >= source && seed < source + range) {
-                    seed = seed + (destination - source)
-                    break
+    function eliminateSpaces(array) {
+        let str = ""
+        let result = []
+
+        for (let i = 0; i < array.length; i++) {
+            if (str = "" && array[i] === " ") {
+                continue
+            } else if (array[i] !== " ") {
+                if (str === "") {
+                    while (array[i] !== " " && i < times.length) {
+                        str = str + array[i]
+                        i++
+                    }
                 }
+                result.push(parseInt(str))
+                str = ""
             }
         }
-        newValues.push(seed)
-    }
-    return newValues
-}
-// [destination, source, range]
 
-//if input is greater than or equal source and less than source + range
-//output = source + (destination - source)
-
-function seedToLocation(data) {
-    let maps = mapsParser(data)
-    let seeds = maps[0]
-    seeds = seeds.split(" ")
-
-    let soils = passThroughMap(seeds, maps[1])
-    let fertilizers = passThroughMap(soils, maps[2])
-    let waters = passThroughMap(fertilizers, maps[3])
-    let lights = passThroughMap(waters, maps[4])
-    let temperatures = passThroughMap(lights, maps[5])
-    let humidities = passThroughMap(temperatures, maps[6])
-    let locations = passThroughMap(humidities, maps[7])
-
-    let minLocation = Infinity
-
-    for (const location of locations) {
-        minLocation = Math.min(minLocation, location)
+        return result
     }
 
-    return minLocation
+    for (let i = 0; i < distancesArray.length; i++) {
+        racesArray.push([timesArray[i], distancesArray[i]])
+    }
+
+    return racesArray
 }
 
-function seedToLocationRangeOfSeeds(data) {
-    let maps = mapsParser(data)
-    let seeds = maps[0]
-    seeds = seeds.split(" ")
-    let seed1 = parseInt(seeds[1])
-    let seed2 = parseInt(seeds[3])
-    let seed1Range = parseInt(seeds[2])
-    let seed2Range = parseInt(seeds[4])
+function raceKernErrorParser(data) {
+    let lines = data.split(/\r?\n/)
 
-    let seedRange = []
+    let timeLine = lines[0].split(":")
+    let time = timeLine[1].split(" ")
 
-    for (let i = 0; i < seed1Range; i++) {
-        seedRange.push(seed1+i)
-        console.log(seed1Range.length)
-    }
-    for (let i = 0; i < seed2Range; i++) {
-        seedRange.push(seed2+i)
-    }
-    console.log(seedRange)
+    let distanceLine = lines[1].split(":")
+    let distance = distanceLine[1].split(" ")
 
-    let soils = passThroughMap(seedRange, maps[1])
-    let fertilizers = passThroughMap(soils, maps[2])
-    let waters = passThroughMap(fertilizers, maps[3])
-    let lights = passThroughMap(waters, maps[4])
-    let temperatures = passThroughMap(lights, maps[5])
-    let humidities = passThroughMap(temperatures, maps[6])
-    let locations = passThroughMap(humidities, maps[7])
+    let timeInt = removeSpaces(time)
+    let distanceInt = removeSpaces(distance)
 
-    let minLocation = Infinity
-
-    for (const location of locations) {
-        minLocation = Math.min(minLocation, location)
+    function removeSpaces(array) {
+        let str = ""
+        for (let i = 0; i < array.length; i++) {
+            if (array[i] !== " " ) {
+                str = str + array[i]
+            }
+        }
+        return parseInt(str)
     }
 
-    return minLocation
+    return [timeInt, distanceInt]
 }
 
-// console.log(seedToLocation(example))
-// console.log(seedToLocation(input))
-// console.log(seedToLocationRangeOfSeeds(example))
-console.log(seedToLocationRangeOfSeeds(input))
+function waysToBeatRecord(time, distance) {
+    let firstValue = 0
+    for (let i = 0; i < time; i++) {
+        if (i * (time - i) > distance) {
+            firstValue = i
+            break
+        }
+    }
+    return time - (2*firstValue) + 1
+}
 
+function recordBeatingProduct(races) {
+    const racesArray = raceProductParser(races)
+    let product = 1
+
+    for (const race of racesArray) {
+        let raceTime = race[0]
+        let raceDistance = race[1]
+        product *= waysToBeatRecord(raceTime, raceDistance)
+    }
+    return product
+}
+
+function kernErrorWaysToWin(races) {
+    const kernErrorTime = raceKernErrorParser(races)[0]
+    const kernErrorDistance = raceKernErrorParser(races)[1]
+    return waysToBeatRecord(kernErrorTime, kernErrorDistance)
+}
+
+
+console.log(recordBeatingProduct(example))
+console.log(recordBeatingProduct(input))
+
+console.log(kernErrorWaysToWin(example))
+console.log(kernErrorWaysToWin(input))
